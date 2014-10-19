@@ -4,7 +4,7 @@ pytlookup
 Python implementation of NSLOOKUP using socket.getfqdn() in a threaded Queue for a much faster lookup speed.
 Utilizes locks to prevent other Queues from stepping on current running thread
 
-dumps all returned domain names to repective subnet file broken on the /24 (256) IP's
+dumps all returned domain names to respective subnet file broken on the /24 (256) IP's
 
 example command:
 
