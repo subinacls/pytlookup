@@ -38,15 +38,25 @@ def makerlist():
     try:
         #print threading.active_count()   ## diagnostics
         print "\n\t[-] Making IP range list"  ## diagnostics
-        for ip in IPNetwork(trange):
-            if str(ip).split("'")[0] not in rlist:
-                rlist.append(str(ip).split("'")[0])
-            else:
-                pass
+        if os.path.isfile(trange):
+            with open(trange, "r") as timport:
+                for ip in timport:
+                    if str(ip).split("'")[0] not in rlist:
+                        rlist.append(str(ip).split("\n")[0])
+                    else:
+                        pass
+            print "\n\t\t[!] Testing total ip(s): %s\n" % (str(len(rlist)))  ## diagnostics
+        else:
+            for ip in IPNetwork(trange):
+                if str(ip).split("'")[0] not in rlist:
+                    rlist.append(str(ip).split("'")[0])
+                else:
+                    pass
+            print "\n\t\t[!] Testing subnet(s): %s - %s\n" % (str(rlist[0]), str(rlist[-1]))  ## diagnostics
+
         __builtin__.rll = len(rlist)
         #print rll, "rll"  ## diagnostics
         print "\n\t[-] Processing DNS request"  ## diagnostics
-        print "\n\t\t[!] Testing subnet(s): %s - %s\n" % (str(rlist[0]), str(rlist[-1]))  ## diagnostics
     except Exception as failediplist:
         #print failediplist, "failediplist"  ## diagnostics
         pass
