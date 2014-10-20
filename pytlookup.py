@@ -9,6 +9,7 @@ __version__ = "20141009"
 # Dumps files to disk, already parsed out to have relevant information
 ###
 
+# basic imports needed for script functionality
 import re
 import os
 import sys
@@ -20,18 +21,23 @@ from Queue import *
 from netaddr import IPNetwork
 from progressbar import ProgressBar  ## might need pip to install progressbar
 
-# set my blank list
+# set my dafaults
 __builtin__.flist = []
 __builtin__.rlist = []
-__builtin__.nsl = []
 __builtin__.c = 0
 __builtin__.queue = Queue()
 __builtin__.lock = threading.Lock()
 
-# take user arguments
+# take user arguments, i know its not a variable ...
 def takevar():
-    __builtin__.trange = sys.argv[1]
-    __builtin__.pname = sys.argv[2]
+    __builtin__.trange = str(sys.argv[1]).split(" ;;,.'\"&")[0]  # trying to sanatize user input, i guess ...
+    __builtin__.pname = str(sys.argv[2]).split(" ;;,.'\"&")[0]  # trying to sanatize user input, i guess ...
+    try:
+        if sys.argv[3::]:  # if anything more then 2, error out
+            sys.exit()
+    except Exception as morearguments:
+        #print morearguments, "morearguments"  ## diagnostics
+        pass
 
 # make all listed IPs in CIDR - dont care about broad/multicast, route, subnet
 def makerlist():
@@ -102,20 +108,19 @@ def pdns():
         #print mpdnsfail, "mdnsfail"  ## diagnostics
         pass
 
-
-def wrapitupB(c, flist):
+# function to write log files
+def wrapitupB(c, flist):  # takes c (count) and list of ip,domain information
     try:
-        #print flist
+        #print flist, "flist"  ## diagnostics
         fr = flist[0].split(".")  # get the first IP in flist and split individual Octets
         frt= str(fr[0]) + "." + str(fr[1]) + "." + str(fr[2]) + ".0"  # reconstruct to make it a /24 subnet
-        #frt = str(fr[0])+"_"+str(fr[1])
         if c <= 0:  # check if we have already blanked the original file if it existed
             if os.path.isfile("./"+str(pname)+"_"+str(frt)+"_FQDN.txt"):  # if it was not blanked, do so now
                 with open("./"+str(pname)+"_"+str(frt)+"_FQDN.txt", "w") as f:
                     f.write("")
                 c = 1  # make it known we have already blanked original file
         # prep to write file
-        #print c, "file write counter"
+        #print c, "file write counter"  ## diagnostics
         #print "\n\t[-] Writing file: " + "./"+str(pname)+"_"+str(frt)+"_FQDN.txt\n"  ## diagnostics
         #print flist, "flist"
         for xr in flist:  # for each IP in final list
